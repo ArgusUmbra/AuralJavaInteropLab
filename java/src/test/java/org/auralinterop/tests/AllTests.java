@@ -15,6 +15,7 @@ public final class AllTests {
         BoundedFileReaderTest.register();
         StrictJsonParserTest.register();
         JcsCanonicalizerTest.register(Path.of(arguments[0]));
+        ManifestValidatorTest.register(Path.of(arguments[0]));
         TestSupport.finish();
     }
 }
