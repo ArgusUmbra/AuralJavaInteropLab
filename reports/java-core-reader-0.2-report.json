@@ -1,0 +1,510 @@
+{
+  "adapter": {
+    "command": [
+      "C:\\CodexLab\\AuralJavaInteropLab\\java\\aural-adapter.cmd"
+    ],
+    "protocol": "org.aural.conformance.adapter",
+    "protocol_version": 1
+  },
+  "cases": [
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-altered-original",
+      "duration_ms": 750,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-altered-original.aural",
+        "sha256": "beeaaf62836cdbd8eae08ec97d2ea4d990aa245475d1919de2faa6ed05500ae6",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-asset-hash",
+      "duration_ms": 594,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-asset-hash.aural",
+        "sha256": "5c4c576216a21905fb08aafcd15155099ee09130b52f2a6f1b4df52fd9bbf250",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-compression",
+      "duration_ms": 703,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-compression.aural",
+        "sha256": "7a00c6b5c0f7e3963893ff8628dc649f64a570eb23653e8bb09d8e2cbc3843a4",
+        "size": 452
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-critical-extension",
+      "duration_ms": 516,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-critical-extension.aural",
+        "sha256": "8c79c792202493f7e288c52e47658a963f8199b48f0cbf5ac828c746d679266e",
+        "size": 651
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-duplicate-entry",
+      "duration_ms": 437,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-duplicate-entry.aural",
+        "sha256": "2c7279ca8b5c72e7d990bfbe1ef3fc4d417cb6b5fcb64bdc9a644e9506b8d46c",
+        "size": 912
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-duplicate-key",
+      "duration_ms": 454,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-duplicate-key.aural",
+        "sha256": "d7b8cdbe81520e4d9b273c82508bef88aeac0ff74834e60ac9b055aa746950fc",
+        "size": 571
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-entry-comment",
+      "duration_ms": 687,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-entry-comment.aural",
+        "sha256": "218bcf02b522c1ab5adfe2e07fd9baa946c465a8cc70514daee0edacbfede694",
+        "size": 573
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-excessive-declared-size",
+      "duration_ms": 781,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-excessive-declared-size.aural",
+        "sha256": "2f529c69ddcecec1de5f81241be29e1341f60d20a24686831354f800460c68bd",
+        "size": 557
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-excessive-depth",
+      "duration_ms": 516,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-excessive-depth.aural",
+        "sha256": "1792e6885968d8dc31521d347350198c12ceaba1b8a3e437ad2ae2e17c788122",
+        "size": 647
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-extra-field",
+      "duration_ms": 406,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-extra-field.aural",
+        "sha256": "4814055b3c3c11cb94bc0fbcecfb8f7fcbec6e070a1474ff4d796ad69771670e",
+        "size": 557
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-fraction",
+      "duration_ms": 453,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-fraction.aural",
+        "sha256": "467bd95238ff4503bb445d84feeb6bb4138b162498635f846724e21e1ca9f239",
+        "size": 551
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-local-central-crc",
+      "duration_ms": 375,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-local-central-crc.aural",
+        "sha256": "03421813e33e108cdb2caa32b056a32180d36fa12dbd0ae0b0ef345795c1dd18",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-malformed-json",
+      "duration_ms": 453,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-malformed-json.aural",
+        "sha256": "769e17135887991505f32879222dcd838b44f1246da498044e18a6dace7f8c0a",
+        "size": 298
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-malformed-local-header",
+      "duration_ms": 329,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-malformed-local-header.aural",
+        "sha256": "a00ab5632514ac461b94dc857efcc07c57e2ba09dea5e208d9ebf6f1db0823e2",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-negative-zero",
+      "duration_ms": 390,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-negative-zero.aural",
+        "sha256": "a93f986d8c3e2f99ed7e2d879575ca0158aa9c9a5295bd086c9a6ac621bb8a8c",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-noncanonical",
+      "duration_ms": 391,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-noncanonical.aural",
+        "sha256": "2654c40b9885cc3bb16de8c8fb50bb150a1a76384cce5acbb7c1ee52454f5bfd",
+        "size": 619
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-noncharacter",
+      "duration_ms": 406,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-noncharacter.aural",
+        "sha256": "1bfe15553eadd4c83ffb4185c12e816d50fb5cfff0f9fd52a33d43837b19d5e2",
+        "size": 566
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-special-file",
+      "duration_ms": 328,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-special-file.aural",
+        "sha256": "d4e8cc8e7c3f3e676662e5b42eb835692588177013402627f3b4182d4a6aab7a",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-trailer",
+      "duration_ms": 313,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-trailer.aural",
+        "sha256": "847c2f10d3036f70ccf2bc40220fb84cdb6fc64f62db189f0f783987b2dbf73a",
+        "size": 567
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-unknown-member",
+      "duration_ms": 343,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-unknown-member.aural",
+        "sha256": "4f8bb003c6865f5343c2cc4ee3963f95b0d49bae51a107babcbc24768f9e07d8",
+        "size": 570
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-unnecessary-zip64-extra",
+      "duration_ms": 297,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-unnecessary-zip64-extra.aural",
+        "sha256": "a2e32735fb69e3e1cca82c885ac5e5476059bb4481fa3492009cefc53c7c35ab",
+        "size": 565
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-unpaired-surrogate",
+      "duration_ms": 407,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-unpaired-surrogate.aural",
+        "sha256": "1048b6772c3012e2b0bb232df66137a606a0e905bda22ba4ed9f63555b66ef7f",
+        "size": 566
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-unsafe-filename",
+      "duration_ms": 296,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-unsafe-filename.aural",
+        "sha256": "84be64b199e829a416d383e31f406fa822879fd140d4e5b721db5296d3cc7971",
+        "size": 543
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-unsafe-integer",
+      "duration_ms": 407,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-unsafe-integer.aural",
+        "sha256": "43ab0b7b78d8484e7c874b2d89a9f8d27fe3088f213d6478a8046b2e25087061",
+        "size": 563
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-utf8",
+      "duration_ms": 359,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-utf8.aural",
+        "sha256": "09dd54a0fe3e19d3aa4e7eabd300abfda0fa6655c2b738036dd5f60f49335db8",
+        "size": 302
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/invalid-version",
+      "duration_ms": 359,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-version.aural",
+        "sha256": "5f69ce4deea3cc0e746a2f1f3d869b917ae522685b750674c9f9e83c4f1a27bd",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/valid-independent",
+      "duration_ms": 375,
+      "expected_outcome": "accept",
+      "fixture": {
+        "path": "valid-independent.aural",
+        "sha256": "66968f5b917d972797cac9a4b6600e3c6743600653cb8183536ee77b7a666a2b",
+        "size": 549
+      },
+      "observed_outcome": "accept",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/valid-minimal",
+      "duration_ms": 391,
+      "expected_outcome": "accept",
+      "fixture": {
+        "path": "valid-minimal.aural",
+        "sha256": "aae82053118bedd4ab55c32322aeab7219ac2f4fced5847eee6d07215feda6a3",
+        "size": 549
+      },
+      "observed_outcome": "accept",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/valid-unicode",
+      "duration_ms": 375,
+      "expected_outcome": "accept",
+      "fixture": {
+        "path": "valid-unicode.aural",
+        "sha256": "61bc898ebcc547586c11bbfc2507b1111ce91342f5b49559789d1c2d052bbf85",
+        "size": 690
+      },
+      "observed_outcome": "accept",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
+      "case_id": "aural-core-reader/0.2-draft/valid-unknown-optional",
+      "duration_ms": 375,
+      "expected_outcome": "accept",
+      "fixture": {
+        "path": "valid-unknown-optional.aural",
+        "sha256": "0d49bb044d089d5999152aa43011e8246dc0112391d8900d350511498925f20f",
+        "size": 607
+      },
+      "observed_outcome": "accept",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    }
+  ],
+  "execution": {
+    "architecture": "AMD64",
+    "per_case_timeout_seconds": 10.0,
+    "platform": "Windows",
+    "python_implementation": "CPython",
+    "python_version": "3.11.5"
+  },
+  "generated_at": "2026-10-20T04:56:44.577899Z",
+  "manifest": {
+    "path": "C:\\CodexLab\\AuralJavaInteropLab\\frozen-input\\tests\\fixtures\\conformance\\core-reader-0.2-cases.v1.json",
+    "sha256": "eea283420315768e4bce2d5824408d671d34c08db06482da845d75dc3118e204"
+  },
+  "notice": "Conformance-test evidence; not official certification or security certification.",
+  "optional_legacy_included": false,
+  "overall_result": "PASS",
+  "profile": {
+    "id": "aural-core-reader",
+    "status": "draft",
+    "version": "0.2-draft"
+  },
+  "schema": "urn:aural:conformance:runner-report",
+  "schema_version": 1,
+  "summary": {
+    "execution_errors": 0,
+    "failed": 0,
+    "optional": {
+      "execution_errors": 0,
+      "failed": 0,
+      "passed": 0,
+      "selected": 0,
+      "skipped": 0,
+      "timeouts": 0
+    },
+    "overall_result": "PASS",
+    "passed": 30,
+    "required": {
+      "execution_errors": 0,
+      "failed": 0,
+      "passed": 30,
+      "selected": 30,
+      "skipped": 0,
+      "timeouts": 0
+    },
+    "required_cases": 30,
+    "selected_cases": 30,
+    "skipped": 0,
+    "timeouts": 0
+  },
+  "test_kit_version": "1"
+}

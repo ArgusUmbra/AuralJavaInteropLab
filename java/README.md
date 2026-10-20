@@ -2,9 +2,9 @@
 
 This is an independent, standard-library-only Java 21 interoperability experiment.
 It is not an official AURAL reference implementation or a certification. It now
-implements the complete Draft 0.2 Core Reader verification scope; Adapter Protocol 1,
-signatures, provenance, attestations, AUFX transport, and evidence interpretation are
-outside this milestone.
+implements the complete Draft 0.2 Core Reader verification scope and the experimental
+Adapter Protocol 1 process boundary. Signatures, provenance, attestations, AUFX
+transport, and evidence interpretation are outside this milestone.
 
 `org.auralinterop.manifest.ManifestValidator` is the Draft 0.2 manifest API. Its
 `validate(byte[])` method returns an immutable, parser-independent `Manifest`, or
@@ -306,9 +306,53 @@ reviewed for compatibility but was not run or expanded during this assignment. A
 risk is environmental and integration behavior at genuine large offsets, despite the
 small ZIP64 and synthetic boundary coverage.
 
-Adapter Protocol 1 integration is the remaining planned 7G work. Provenance signatures,
-detached signed events, team attestations, AUFX transport, and evidence interpretation
-remain separate capabilities.
+## Experimental Adapter Protocol 1
+
+`org.auralinterop.adapter.AuralConformanceAdapter` is a one-request process adapter for
+`verify-package`. It enforces the published 16,384-byte request limit, exact request
+members and types, protocol identifier/version, operation, input role, and SHA-256
+syntax. It permits the protocol's leading and trailing JSON whitespace. A usable input
+path is passed directly to `AuralPackageVerifier`; controlled package verification
+failures become `outcome: "reject"`, while malformed requests, unsupported operations,
+unusable paths, and unexpected failures exit nonzero without a stdout response.
+
+The adapter never receives or reads an expected result. Its `case_id`, request size,
+request SHA-256, and fixture filename do not determine acceptance. The supplied runner
+has already authenticated request size and SHA-256; the adapter validates those fields'
+protocol shape, then obtains its verdict exclusively from package verification.
+
+Build before invoking the launcher; compilation is deliberately separate from protocol
+stdout:
+
+```powershell
+Set-Location C:\CodexLab\AuralJavaInteropLab\java
+powershell -NoProfile -ExecutionPolicy Bypass -File .\build.ps1
+```
+
+`aural-adapter.cmd` resolves its classpath from its own location, so the caller's
+working directory is irrelevant. It requires only Java 21 on `PATH` and accepts the
+request on stdin; it does not change PowerShell execution policy or launch an IDE.
+
+Run the official conformance runner from the AURAL source checkout against the frozen
+manifest as follows:
+
+```powershell
+python tools\run_aural_conformance.py `
+  --profile core-reader-0.2 `
+  --manifest C:\CodexLab\AuralJavaInteropLab\frozen-input\tests\fixtures\conformance\core-reader-0.2-cases.v1.json `
+  --report C:\CodexLab\AuralJavaInteropLab\reports\java-core-reader-0.2-report.json `
+  --timeout 10 `
+  --adapter C:\CodexLab\AuralJavaInteropLab\java\aural-adapter.cmd
+```
+
+The recorded Assignment 7G run passed all 30 required Draft 0.2 Core Reader cases with
+no failures, execution errors, timeouts, or skips. The report is test evidence, not
+official certification or security certification. Protocol 1 defines no format field
+in its envelope: supported AURAL format/version identification remains part of the
+delegated package verifier.
+
+Provenance signatures, detached signed events, team attestations, AUFX transport, and
+evidence interpretation remain separate capabilities.
 
 Build from the `java` directory on Windows without changing machine policy:
 
@@ -323,9 +367,12 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\test.ps1
 ```
 
 The project has no third-party dependencies and is compiled with `javac --release 21`.
-The build also enables `-Xlint:all -Werror`. The normal suite contains 401 tests:
+The build also enables `-Xlint:all -Werror`. The normal suite contains 421 tests:
 all 304 pre-7F tests remain registered; 65 independent complete-verifier cases were
 added (21 positive and 44 negative); all 30 required public Core Reader cases are
-separate oracle-driven regressions; and two optional legacy fixtures confirm the
-explicit Draft 0.1 capability boundary. The optional >4 GiB test is not registered or
-included in that count.
+separate oracle-driven regressions; two optional legacy fixtures confirm the explicit
+Draft 0.1 capability boundary; and 20 separate adapter process tests cover acceptance,
+rejection, malformed envelopes, unsupported values, field types, byte limits, output
+discipline, path failures, surrounding whitespace, launcher relocation behavior,
+spaces, and Unicode. The optional >4 GiB test is not registered or included in that
+count.

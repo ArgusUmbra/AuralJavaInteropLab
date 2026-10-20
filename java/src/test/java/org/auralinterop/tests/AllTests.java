@@ -19,6 +19,7 @@ public final class AllTests {
         ZipStructureParserTest.register(Path.of(arguments[0]).getParent());
         Zip64StructureParserTest.register();
         AuralPackageVerifierTest.register(Path.of(arguments[0]).getParent());
+        AdapterProtocolTest.register(Path.of(arguments[0]).getParent());
         TestSupport.finish();
     }
 }

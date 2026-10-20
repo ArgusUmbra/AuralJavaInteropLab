@@ -1,3 +1,5 @@
 /build/
-/reports/
+/reports/*
+!/reports/008D-3F-7G-AUDIT.md
+!/reports/java-core-reader-0.2-report.json
 *.class
