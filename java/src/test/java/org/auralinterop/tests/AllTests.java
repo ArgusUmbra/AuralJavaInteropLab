@@ -16,6 +16,7 @@ public final class AllTests {
         StrictJsonParserTest.register();
         JcsCanonicalizerTest.register(Path.of(arguments[0]));
         ManifestValidatorTest.register(Path.of(arguments[0]));
+        ZipStructureParserTest.register(Path.of(arguments[0]).getParent());
         TestSupport.finish();
     }
 }
