@@ -495,44 +495,47 @@ final class ZipStructureParserTest {
     }
 
     private static void zip64BoundaryCases() {
-        TestSupport.test("ZIP64 EOCD entry-count sentinel is controlled unsupported", () -> {
+        TestSupport.test("ZIP64 EOCD entry-count sentinel requires locator", () -> {
             Build archive = new Builder().build();
             put16(archive.bytes(), archive.eocdOffset() + 8, 0xffff);
             put16(archive.bytes(), archive.eocdOffset() + 10, 0xffff);
-            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE);
+            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_LOCATOR);
         });
-        TestSupport.test("ZIP64 EOCD central-size sentinel is controlled unsupported", () -> {
+        TestSupport.test("ZIP64 EOCD central-size sentinel requires locator", () -> {
             Build archive = new Builder().build();
             put32(archive.bytes(), archive.eocdOffset() + 12, 0xffff_ffffL);
-            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE);
+            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_LOCATOR);
         });
-        TestSupport.test("ZIP64 EOCD central-offset sentinel is controlled unsupported", () -> {
+        TestSupport.test("ZIP64 EOCD central-offset sentinel requires locator", () -> {
             Build archive = new Builder().build();
             put32(archive.bytes(), archive.eocdOffset() + 16, 0xffff_ffffL);
-            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE);
+            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_LOCATOR);
         });
-        TestSupport.test("ZIP64 central size sentinel with exact extra is controlled unsupported", () -> {
+        TestSupport.test("ZIP64 central expanded size must agree with local size", () -> {
             Builder builder = new Builder();
+            builder.entries.get(0).versionNeeded = 45;
             builder.entries.get(0).centralExtra = extra(1, new byte[16]);
             Build archive = builder.build();
             put32(archive.bytes(), archive.centralOffsets()[0] + 20, 0xffff_ffffL);
             put32(archive.bytes(), archive.centralOffsets()[0] + 24, 0xffff_ffffL);
-            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE);
+            assertReject(archive.bytes(), ZipStructureException.Reason.HEADER_MISMATCH);
         });
-        TestSupport.test("ZIP64 central local-offset sentinel with exact extra is controlled unsupported", () -> {
+        TestSupport.test("ZIP64 central local-offset sentinel with exact extra is accepted", () -> {
             Builder builder = new Builder();
+            builder.entries.get(0).versionNeeded = 45;
             builder.entries.get(0).centralExtra = extra(1, new byte[8]);
             Build archive = builder.build();
             put32(archive.bytes(), archive.centralOffsets()[0] + 42, 0xffff_ffffL);
-            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE);
+            assertAccept(archive.bytes());
         });
-        TestSupport.test("ZIP64 local size sentinel with exact extra is controlled unsupported", () -> {
+        TestSupport.test("ZIP64 local expanded size must agree with central size", () -> {
             Builder builder = new Builder();
+            builder.entries.get(0).versionNeeded = 45;
             builder.entries.get(0).localExtra = extra(1, new byte[16]);
             Build archive = builder.build();
             put32(archive.bytes(), archive.localOffsets()[0] + 18, 0xffff_ffffL);
             put32(archive.bytes(), archive.localOffsets()[0] + 22, 0xffff_ffffL);
-            assertReject(archive.bytes(), ZipStructureException.Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE);
+            assertReject(archive.bytes(), ZipStructureException.Reason.HEADER_MISMATCH);
         });
         TestSupport.test("ZIP64 sentinel without required extra is malformed", () -> {
             Build archive = new Builder().build();

@@ -27,8 +27,8 @@ final class LocalFileHeaderParser {
         int modificationTime = ZipParsing.unsignedShort(fixed, 10);
         int modificationDate = ZipParsing.unsignedShort(fixed, 12);
         long crc32 = ZipParsing.unsignedInt(fixed, 14);
-        long compressedSize = ZipParsing.unsignedInt(fixed, 18);
-        long uncompressedSize = ZipParsing.unsignedInt(fixed, 22);
+        long rawCompressedSize = ZipParsing.unsignedInt(fixed, 18);
+        long rawUncompressedSize = ZipParsing.unsignedInt(fixed, 22);
         int nameLength = ZipParsing.unsignedShort(fixed, 26);
         int extraLength = ZipParsing.unsignedShort(fixed, 28);
 
@@ -48,12 +48,15 @@ final class LocalFileHeaderParser {
         byte[] rawName = Arrays.copyOfRange(variable, 0, nameLength);
         String name = ZipParsing.allowedName(rawName);
         byte[] extra = Arrays.copyOfRange(variable, nameLength, variable.length);
-        boolean requiresZip64 = ZipParsing.validateExtra(
-                extra,
-                uncompressedSize == ZipParsing.UINT32_SENTINEL,
-                compressedSize == ZipParsing.UINT32_SENTINEL,
-                false,
-                false);
+        long sizeMaximum = name.equals("manifest.json")
+                ? ZipLimits.MAXIMUM_MANIFEST_SIZE
+                : ZipLimits.MAXIMUM_ORIGINAL_SIZE;
+        Zip64ExtraField.Values resolved = Zip64ExtraField.resolveLocal(
+                extra, rawUncompressedSize, rawCompressedSize, sizeMaximum);
+        if (resolved.usesZip64() && versionNeeded != 45) {
+            throw new ZipStructureException(
+                    Reason.INVALID_VERSION_NEEDED, "a local header using ZIP64 must require version 4.5");
+        }
 
         return new Entry(
                 name,
@@ -64,10 +67,13 @@ final class LocalFileHeaderParser {
                 modificationTime,
                 modificationDate,
                 crc32,
-                compressedSize,
-                uncompressedSize,
+                rawCompressedSize,
+                rawUncompressedSize,
+                resolved.compressedSize(),
+                resolved.uncompressedSize(),
                 new ByteRange(offset, headerEnd),
-                requiresZip64);
+                resolved.compressedFromZip64(),
+                resolved.uncompressedFromZip64());
     }
 
     record Entry(
@@ -79,9 +85,15 @@ final class LocalFileHeaderParser {
             int modificationTime,
             int modificationDate,
             long crc32,
+            long rawCompressedSize,
+            long rawUncompressedSize,
             long compressedSize,
             long uncompressedSize,
             ByteRange headerRange,
-            boolean requiresZip64) {
+            boolean compressedSizeFromZip64,
+            boolean uncompressedSizeFromZip64) {
+        boolean usesZip64() {
+            return compressedSizeFromZip64 || uncompressedSizeFromZip64;
+        }
     }
 }

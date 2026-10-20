@@ -14,7 +14,7 @@ import java.util.Objects;
 import static org.auralinterop.zip.ZipStructureException.Reason;
 
 /**
- * Direct, read-only parser for the classic AURAL Draft 0.2 ZIP structural profile.
+ * Direct, read-only parser for the classic and ZIP64 AURAL Draft 0.2 structural profile.
  *
  * <p>The parser does not decompress, extract, calculate CRC32, inspect JSON or WAVE data, or
  * calculate SHA-256. A successful result is therefore structural acceptance, not complete AURAL
@@ -23,6 +23,7 @@ import static org.auralinterop.zip.ZipStructureException.Reason;
  */
 public final class ZipStructureParser {
     private final ClassicEocdParser eocdParser = new ClassicEocdParser();
+    private final Zip64EndParser zip64EndParser = new Zip64EndParser();
     private final CentralDirectoryParser centralDirectoryParser = new CentralDirectoryParser();
     private final LocalFileHeaderParser localFileHeaderParser = new LocalFileHeaderParser();
 
@@ -40,11 +41,9 @@ public final class ZipStructureParser {
     }
 
     private ZipArchiveStructure parse(BoundedFileReader reader) throws IOException {
-        ClassicEocdParser.Eocd eocd = eocdParser.parse(reader);
+        ClassicEocdParser.Eocd classicEocd = eocdParser.parse(reader);
+        Zip64EndParser.End eocd = zip64EndParser.resolve(reader, classicEocd);
         CentralDirectoryParser.Result central = centralDirectoryParser.parse(reader, eocd);
-        if (central.requiresZip64()) {
-            throw zip64Boundary("a central-directory entry requires ZIP64 expansion");
-        }
 
         List<CentralDirectoryParser.Entry> physicalOrder = new ArrayList<>(central.entries());
         physicalOrder.sort(Comparator.comparingLong(CentralDirectoryParser.Entry::localHeaderOffset));
@@ -52,9 +51,6 @@ public final class ZipStructureParser {
         for (CentralDirectoryParser.Entry centralEntry : physicalOrder) {
             LocalFileHeaderParser.Entry local = localFileHeaderParser.parse(
                     reader, centralEntry.localHeaderOffset(), eocd.centralDirectoryOffset());
-            if (local.requiresZip64()) {
-                throw zip64Boundary("a local-file header requires ZIP64 expansion");
-            }
             validateAgreement(local, centralEntry);
             pairs.add(new ParsedPair(local, centralEntry));
         }
@@ -87,8 +83,14 @@ public final class ZipStructureParser {
                     centralEntry.modificationTime(),
                     centralEntry.modificationDate(),
                     centralEntry.crc32(),
+                    centralEntry.rawCompressedSize(),
+                    centralEntry.rawUncompressedSize(),
                     centralEntry.compressedSize(),
                     centralEntry.uncompressedSize(),
+                    centralEntry.rawLocalHeaderOffset(),
+                    centralEntry.compressedSizeFromZip64(),
+                    centralEntry.uncompressedSizeFromZip64(),
+                    centralEntry.localHeaderOffsetFromZip64(),
                     centralEntry.internalAttributes(),
                     centralEntry.externalAttributes(),
                     local.headerRange(),
@@ -104,8 +106,11 @@ public final class ZipStructureParser {
         return new ZipArchiveStructure(
                 eocd.archiveSize(),
                 resultEntries,
-                new ByteRange(eocd.centralDirectoryOffset(), eocd.eocdOffset()),
-                new ByteRange(eocd.eocdOffset(), eocd.archiveSize()));
+                new ByteRange(eocd.centralDirectoryOffset(), eocd.terminalOffset()),
+                new ByteRange(eocd.terminalOffset(), eocd.archiveSize()),
+                eocd.usesZip64(),
+                eocd.zip64EocdRange(),
+                eocd.zip64LocatorRange());
     }
 
     private static void validateAgreement(
@@ -138,12 +143,6 @@ public final class ZipStructureParser {
 
     private static ZipStructureException mismatch(String field) {
         return new ZipStructureException(Reason.HEADER_MISMATCH, "local and central " + field + " disagree");
-    }
-
-    private static ZipStructureException zip64Boundary(String message) {
-        return new ZipStructureException(
-                Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE,
-                message + "; ZIP64 decoding is deferred to Assignment 7E");
     }
 
     private record ParsedPair(LocalFileHeaderParser.Entry local, CentralDirectoryParser.Entry central) {

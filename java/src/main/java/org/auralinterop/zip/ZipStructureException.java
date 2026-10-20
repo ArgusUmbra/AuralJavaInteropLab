@@ -33,6 +33,9 @@ public final class ZipStructureException extends IOException {
         HEADER_MISMATCH,
         LAYOUT,
         INVALID_RANGE,
+        ZIP64_EOCD,
+        ZIP64_LOCATOR,
+        ZIP64_VALUE,
         ZIP64_UNSUPPORTED_IN_THIS_STAGE
     }
 
@@ -52,7 +55,10 @@ public final class ZipStructureException extends IOException {
         return reason;
     }
 
-    /** Returns true only for the temporary Assignment 008D-3F-7D capability boundary. */
+    /**
+     * Legacy 7D compatibility query. The 7E parser retains the enum value for callers but no
+     * longer emits it for ZIP64 structures in the supported Draft 0.2 profile.
+     */
     public boolean isZip64UnsupportedInThisStage() {
         return reason == Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE;
     }

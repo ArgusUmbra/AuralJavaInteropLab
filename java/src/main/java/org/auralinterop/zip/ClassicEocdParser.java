@@ -40,37 +40,11 @@ final class ClassicEocdParser {
                 || (centralDirectoryDisk != 0 && centralDirectoryDisk != ZipParsing.UINT16_SENTINEL)) {
             throw new ZipStructureException(Reason.MULTI_DISK, "multi-disk ZIP metadata is prohibited");
         }
-        if (diskNumber == ZipParsing.UINT16_SENTINEL
-                || centralDirectoryDisk == ZipParsing.UINT16_SENTINEL
-                || entriesOnDisk == ZipParsing.UINT16_SENTINEL
-                || totalEntries == ZipParsing.UINT16_SENTINEL
-                || centralDirectorySize == ZipParsing.UINT32_SENTINEL
-                || centralDirectoryOffset == ZipParsing.UINT32_SENTINEL) {
-            throw new ZipStructureException(
-                    Reason.ZIP64_UNSUPPORTED_IN_THIS_STAGE,
-                    "classic EOCD contains a ZIP64 sentinel; ZIP64 parsing is deferred to Assignment 7E");
-        }
-        if (entriesOnDisk != ZipLimits.ENTRY_COUNT || totalEntries != ZipLimits.ENTRY_COUNT) {
-            throw new ZipStructureException(Reason.ENTRY_COUNT, "classic EOCD must declare exactly two entries");
-        }
-        if (entriesOnDisk != totalEntries) {
-            throw new ZipStructureException(Reason.ENTRY_COUNT, "EOCD entry counts disagree");
-        }
-        if (centralDirectorySize > ZipLimits.MAXIMUM_CENTRAL_DIRECTORY_SIZE) {
-            throw new ZipStructureException(
-                    Reason.CENTRAL_DIRECTORY_LIMIT, "central directory exceeds the 4 MiB limit");
-        }
-        long centralDirectoryEnd = ZipParsing.add(
-                centralDirectoryOffset,
-                centralDirectorySize,
-                Reason.CENTRAL_DIRECTORY_BOUNDS,
-                "central-directory range overflows");
-        if (centralDirectoryEnd != eocdOffset) {
-            throw new ZipStructureException(
-                    Reason.CENTRAL_DIRECTORY_BOUNDS,
-                    "central directory must end immediately before the terminal EOCD");
-        }
         return new Eocd(
+                diskNumber,
+                centralDirectoryDisk,
+                entriesOnDisk,
+                totalEntries,
                 centralDirectoryOffset,
                 centralDirectorySize,
                 eocdOffset,
@@ -103,9 +77,21 @@ final class ClassicEocdParser {
     }
 
     record Eocd(
+            int diskNumber,
+            int centralDirectoryDisk,
+            int entriesOnDisk,
+            int totalEntries,
             long centralDirectoryOffset,
             long centralDirectorySize,
             long eocdOffset,
             long archiveSize) {
+        boolean hasZip64Sentinel() {
+            return diskNumber == ZipParsing.UINT16_SENTINEL
+                    || centralDirectoryDisk == ZipParsing.UINT16_SENTINEL
+                    || entriesOnDisk == ZipParsing.UINT16_SENTINEL
+                    || totalEntries == ZipParsing.UINT16_SENTINEL
+                    || centralDirectorySize == ZipParsing.UINT32_SENTINEL
+                    || centralDirectoryOffset == ZipParsing.UINT32_SENTINEL;
+        }
     }
 }

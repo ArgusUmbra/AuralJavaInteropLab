@@ -13,6 +13,8 @@ final class ZipParsing {
     static final long LOCAL_SIGNATURE = 0x04034b50L;
     static final long CENTRAL_SIGNATURE = 0x02014b50L;
     static final long EOCD_SIGNATURE = 0x06054b50L;
+    static final long ZIP64_EOCD_SIGNATURE = 0x06064b50L;
+    static final long ZIP64_LOCATOR_SIGNATURE = 0x07064b50L;
     static final int UTF8_FLAG = 1 << 11;
     static final long UINT32_SENTINEL = 0xffff_ffffL;
     static final int UINT16_SENTINEL = 0xffff;
@@ -34,6 +36,24 @@ final class ZipParsing {
                         | (Byte.toUnsignedInt(bytes[offset + 1]) << 8)
                         | (Byte.toUnsignedInt(bytes[offset + 2]) << 16)
                         | (Byte.toUnsignedInt(bytes[offset + 3]) << 24));
+    }
+
+    static long boundedUnsignedLong(byte[] bytes, int offset, long maximum, String field)
+            throws ZipStructureException {
+        require(bytes, offset, Long.BYTES);
+        long value = 0;
+        for (int index = Long.BYTES - 1; index >= 0; index--) {
+            value = (value << 8) | Byte.toUnsignedLong(bytes[offset + index]);
+        }
+        if (value < 0) {
+            throw new ZipStructureException(
+                    Reason.ZIP64_VALUE, field + " has its unsigned 64-bit high bit set");
+        }
+        if (value > maximum) {
+            throw new ZipStructureException(
+                    Reason.ZIP64_VALUE, field + " exceeds the AURAL supported range");
+        }
+        return value;
     }
 
     static void require(byte[] bytes, int offset, int length) throws ZipStructureException {
@@ -113,32 +133,6 @@ final class ZipParsing {
         if (unixFileType != 0 && unixFileType != 0x8000) {
             throw new ZipStructureException(Reason.FILE_TYPE, "non-regular Unix file type is prohibited");
         }
-    }
-
-    static boolean validateExtra(
-            byte[] extra,
-            boolean uncompressedSentinel,
-            boolean compressedSentinel,
-            boolean offsetSentinel,
-            boolean diskSentinel) throws ZipStructureException {
-        int requiredLength = (uncompressedSentinel ? 8 : 0)
-                + (compressedSentinel ? 8 : 0)
-                + (offsetSentinel ? 8 : 0)
-                + (diskSentinel ? 4 : 0);
-        boolean requiresZip64 = requiredLength != 0;
-        if (!requiresZip64) {
-            if (extra.length != 0) {
-                throw new ZipStructureException(Reason.EXTRA_FIELD, "extra fields require a corresponding ZIP64 sentinel");
-            }
-            return false;
-        }
-        if (extra.length != 4 + requiredLength) {
-            throw new ZipStructureException(Reason.EXTRA_FIELD, "ZIP64 extra field has an incorrect exact length");
-        }
-        if (unsignedShort(extra, 0) != 0x0001 || unsignedShort(extra, 2) != requiredLength) {
-            throw new ZipStructureException(Reason.EXTRA_FIELD, "required ZIP64 extra field is missing or malformed");
-        }
-        return true;
     }
 
     private static byte[] ascii(String value) {

@@ -14,12 +14,11 @@ import static org.auralinterop.zip.ZipStructureException.Reason;
 final class CentralDirectoryParser {
     private static final int FIXED_SIZE = 46;
 
-    Result parse(BoundedFileReader reader, ClassicEocdParser.Eocd eocd) throws IOException {
+    Result parse(BoundedFileReader reader, Zip64EndParser.End eocd) throws IOException {
         byte[] directory = reader.readExact(eocd.centralDirectoryOffset(), eocd.centralDirectorySize());
         List<Entry> entries = new ArrayList<>(ZipLimits.ENTRY_COUNT);
         Set<String> names = new HashSet<>();
         int cursor = 0;
-        boolean requiresZip64 = false;
 
         for (int entryIndex = 0; entryIndex < ZipLimits.ENTRY_COUNT; entryIndex++) {
             ZipParsing.require(directory, cursor, FIXED_SIZE);
@@ -59,12 +58,12 @@ final class CentralDirectoryParser {
             int modificationTime = ZipParsing.unsignedShort(directory, cursor + 12);
             int modificationDate = ZipParsing.unsignedShort(directory, cursor + 14);
             long crc32 = ZipParsing.unsignedInt(directory, cursor + 16);
-            long compressedSize = ZipParsing.unsignedInt(directory, cursor + 20);
-            long uncompressedSize = ZipParsing.unsignedInt(directory, cursor + 24);
+            long rawCompressedSize = ZipParsing.unsignedInt(directory, cursor + 20);
+            long rawUncompressedSize = ZipParsing.unsignedInt(directory, cursor + 24);
             int diskStart = ZipParsing.unsignedShort(directory, cursor + 34);
             int internalAttributes = ZipParsing.unsignedShort(directory, cursor + 36);
             long externalAttributes = ZipParsing.unsignedInt(directory, cursor + 38);
-            long localHeaderOffset = ZipParsing.unsignedInt(directory, cursor + 42);
+            long rawLocalHeaderOffset = ZipParsing.unsignedInt(directory, cursor + 42);
 
             ZipParsing.validateVersionNeeded(versionNeeded);
             ZipParsing.validateFlags(flags);
@@ -83,17 +82,22 @@ final class CentralDirectoryParser {
             }
             int extraStart = nameStart + nameLength;
             byte[] extra = Arrays.copyOfRange(directory, extraStart, extraStart + extraLength);
-            boolean entryRequiresZip64 = ZipParsing.validateExtra(
+            long sizeMaximum = name.equals("manifest.json")
+                    ? ZipLimits.MAXIMUM_MANIFEST_SIZE
+                    : ZipLimits.MAXIMUM_ORIGINAL_SIZE;
+            Zip64ExtraField.Values resolved = Zip64ExtraField.resolveCentral(
                     extra,
-                    uncompressedSize == ZipParsing.UINT32_SENTINEL,
-                    compressedSize == ZipParsing.UINT32_SENTINEL,
-                    localHeaderOffset == ZipParsing.UINT32_SENTINEL,
-                    diskStart == ZipParsing.UINT16_SENTINEL);
-            requiresZip64 |= entryRequiresZip64;
-
-            if (!entryRequiresZip64) {
-                validateSizes(name, compressedSize, uncompressedSize);
+                    rawUncompressedSize,
+                    rawCompressedSize,
+                    rawLocalHeaderOffset,
+                    diskStart,
+                    sizeMaximum,
+                    eocd.archiveSize());
+            if (resolved.usesZip64() && versionNeeded != 45) {
+                throw new ZipStructureException(
+                        Reason.INVALID_VERSION_NEEDED, "an entry using ZIP64 must require version 4.5");
             }
+            validateSizes(name, resolved.compressedSize(), resolved.uncompressedSize());
             long absoluteStart = eocd.centralDirectoryOffset() + cursor;
             entries.add(new Entry(
                     name,
@@ -105,12 +109,18 @@ final class CentralDirectoryParser {
                     modificationTime,
                     modificationDate,
                     crc32,
-                    compressedSize,
-                    uncompressedSize,
-                    diskStart,
+                    rawCompressedSize,
+                    rawUncompressedSize,
+                    resolved.compressedSize(),
+                    resolved.uncompressedSize(),
+                    resolved.diskStart(),
                     internalAttributes,
                     externalAttributes,
-                    localHeaderOffset,
+                    rawLocalHeaderOffset,
+                    resolved.localHeaderOffset(),
+                    resolved.compressedFromZip64(),
+                    resolved.uncompressedFromZip64(),
+                    resolved.offsetFromZip64(),
                     new ByteRange(absoluteStart, absoluteStart + recordLength)));
             cursor += recordLength;
         }
@@ -123,7 +133,7 @@ final class CentralDirectoryParser {
         if (!names.contains("manifest.json") || !names.contains("audio/original.wav")) {
             throw new ZipStructureException(Reason.INVALID_NAME, "both required exact entry names are required");
         }
-        return new Result(List.copyOf(entries), requiresZip64);
+        return new Result(List.copyOf(entries));
     }
 
     private static void validateSizes(String name, long compressedSize, long uncompressedSize)
@@ -139,7 +149,7 @@ final class CentralDirectoryParser {
         }
     }
 
-    record Result(List<Entry> entries, boolean requiresZip64) {
+    record Result(List<Entry> entries) {
     }
 
     record Entry(
@@ -152,12 +162,18 @@ final class CentralDirectoryParser {
             int modificationTime,
             int modificationDate,
             long crc32,
+            long rawCompressedSize,
+            long rawUncompressedSize,
             long compressedSize,
             long uncompressedSize,
             int diskStart,
             int internalAttributes,
             long externalAttributes,
+            long rawLocalHeaderOffset,
             long localHeaderOffset,
+            boolean compressedSizeFromZip64,
+            boolean uncompressedSizeFromZip64,
+            boolean localHeaderOffsetFromZip64,
             ByteRange centralHeaderRange) {
     }
 }

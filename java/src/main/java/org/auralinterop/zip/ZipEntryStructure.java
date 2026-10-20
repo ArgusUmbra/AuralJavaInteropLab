@@ -13,8 +13,14 @@ public final class ZipEntryStructure {
     private final int modificationTime;
     private final int modificationDate;
     private final long crc32;
+    private final long rawCompressedSize32;
+    private final long rawUncompressedSize32;
     private final long compressedSize;
     private final long uncompressedSize;
+    private final long rawLocalHeaderOffset32;
+    private final boolean compressedSizeFromZip64;
+    private final boolean uncompressedSizeFromZip64;
+    private final boolean localHeaderOffsetFromZip64;
     private final int internalAttributes;
     private final long externalAttributes;
     private final ByteRange localHeaderRange;
@@ -31,8 +37,14 @@ public final class ZipEntryStructure {
             int modificationTime,
             int modificationDate,
             long crc32,
+            long rawCompressedSize32,
+            long rawUncompressedSize32,
             long compressedSize,
             long uncompressedSize,
+            long rawLocalHeaderOffset32,
+            boolean compressedSizeFromZip64,
+            boolean uncompressedSizeFromZip64,
+            boolean localHeaderOffsetFromZip64,
             int internalAttributes,
             long externalAttributes,
             ByteRange localHeaderRange,
@@ -47,8 +59,14 @@ public final class ZipEntryStructure {
         this.modificationTime = modificationTime;
         this.modificationDate = modificationDate;
         this.crc32 = crc32;
+        this.rawCompressedSize32 = rawCompressedSize32;
+        this.rawUncompressedSize32 = rawUncompressedSize32;
         this.compressedSize = compressedSize;
         this.uncompressedSize = uncompressedSize;
+        this.rawLocalHeaderOffset32 = rawLocalHeaderOffset32;
+        this.compressedSizeFromZip64 = compressedSizeFromZip64;
+        this.uncompressedSizeFromZip64 = uncompressedSizeFromZip64;
+        this.localHeaderOffsetFromZip64 = localHeaderOffsetFromZip64;
         this.internalAttributes = internalAttributes;
         this.externalAttributes = externalAttributes;
         this.localHeaderRange = Objects.requireNonNull(localHeaderRange, "localHeaderRange");
@@ -66,12 +84,22 @@ public final class ZipEntryStructure {
     public int modificationTime() { return modificationTime; }
     public int modificationDate() { return modificationDate; }
     public long crc32() { return crc32; }
+    public long rawCompressedSize32() { return rawCompressedSize32; }
+    public long rawUncompressedSize32() { return rawUncompressedSize32; }
     public long compressedSize() { return compressedSize; }
     public long uncompressedSize() { return uncompressedSize; }
+    public long rawLocalHeaderOffset32() { return rawLocalHeaderOffset32; }
+    public boolean compressedSizeFromZip64() { return compressedSizeFromZip64; }
+    public boolean uncompressedSizeFromZip64() { return uncompressedSizeFromZip64; }
+    public boolean localHeaderOffsetFromZip64() { return localHeaderOffsetFromZip64; }
+    public boolean usesZip64Extra() {
+        return compressedSizeFromZip64 || uncompressedSizeFromZip64 || localHeaderOffsetFromZip64;
+    }
     public int internalAttributes() { return internalAttributes; }
     public long externalAttributes() { return externalAttributes; }
     public ByteRange localHeaderRange() { return localHeaderRange; }
     public ByteRange dataRange() { return dataRange; }
     public ByteRange centralHeaderRange() { return centralHeaderRange; }
     public long dataOffset() { return dataRange.startInclusive(); }
+    public long localHeaderOffset() { return localHeaderRange.startInclusive(); }
 }
