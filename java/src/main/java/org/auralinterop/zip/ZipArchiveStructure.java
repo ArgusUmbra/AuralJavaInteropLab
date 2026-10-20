@@ -42,6 +42,9 @@ public final class ZipArchiveStructure {
     public ByteRange centralDirectoryRange() { return centralDirectoryRange; }
     public ByteRange endOfCentralDirectoryRange() { return endOfCentralDirectoryRange; }
     public boolean usesZip64EndRecords() { return usesZip64EndRecords; }
+    public boolean usesZip64() {
+        return usesZip64EndRecords || entries.stream().anyMatch(ZipEntryStructure::usesZip64Extra);
+    }
     public Optional<ByteRange> zip64EocdRange() { return Optional.ofNullable(zip64EocdRange); }
     public Optional<ByteRange> zip64LocatorRange() { return Optional.ofNullable(zip64LocatorRange); }
 

@@ -40,7 +40,12 @@ public final class ZipStructureParser {
         }
     }
 
-    private ZipArchiveStructure parse(BoundedFileReader reader) throws IOException {
+    /**
+     * Parse through a caller-owned reader. The reader remains open and can be reused for later
+     * payload-integrity checks against the same channel.
+     */
+    public ZipArchiveStructure parse(BoundedFileReader reader) throws IOException {
+        Objects.requireNonNull(reader, "reader");
         ClassicEocdParser.Eocd classicEocd = eocdParser.parse(reader);
         Zip64EndParser.End eocd = zip64EndParser.resolve(reader, classicEocd);
         CentralDirectoryParser.Result central = centralDirectoryParser.parse(reader, eocd);

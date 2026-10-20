@@ -1,0 +1,15 @@
+package org.auralinterop.verify;
+
+/** Stable top-level categories for controlled AURAL package verification failures. */
+public enum VerificationErrorCategory {
+    ZIP_STRUCTURAL_FAILURE,
+    MANIFEST_PARSING_OR_CANONICALIZATION_FAILURE,
+    MANIFEST_SEMANTIC_FAILURE,
+    REQUIRED_ENTRY_MISSING_OR_MISMATCHED,
+    CRC32_MISMATCH,
+    ORIGINAL_BYTE_COUNT_MISMATCH,
+    ORIGINAL_SHA256_MISMATCH,
+    INVALID_WAV_IDENTIFICATION,
+    RESOURCE_LIMIT_VIOLATION,
+    IO_OR_TRUNCATED_READ_FAILURE
+}

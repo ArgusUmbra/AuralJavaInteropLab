@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.auralinterop.manifest.ManifestValidationException.Stage;
+import static org.auralinterop.manifest.ManifestValidationException.Reason;
 
 /** Complete byte, schema, and semantic validator for AURAL Draft 0.2 manifests. */
 public final class ManifestValidator {
@@ -56,7 +57,11 @@ public final class ManifestValidator {
         try {
             parsed = parser.parse(manifestBytes);
         } catch (JsonParseException invalidJson) {
-            throw new ManifestValidationException(Stage.JSON_SYNTAX, "$",
+            Reason reason = switch (invalidJson.reason()) {
+                case INPUT_LIMIT, DEPTH_LIMIT -> Reason.RESOURCE_LIMIT;
+                default -> Reason.GENERAL;
+            };
+            throw new ManifestValidationException(Stage.JSON_SYNTAX, reason, "$",
                     "invalid Draft 0.2 JSON profile: " + invalidJson.reason(), invalidJson);
         }
 
@@ -155,8 +160,12 @@ public final class ManifestValidator {
         if (!(sizeValue instanceof JsonValue.JsonInteger integer)) {
             throw failure(Stage.SCHEMA, "$.assets[0].size", "must be an integer");
         }
-        if (integer.value() < 0 || integer.value() > MAXIMUM_ASSET_BYTES) {
+        if (integer.value() < 0) {
             throw failure(Stage.SCHEMA, "$.assets[0].size", "must be between 0 and 8589934592 inclusive");
+        }
+        if (integer.value() > MAXIMUM_ASSET_BYTES) {
+            throw new ManifestValidationException(Stage.SCHEMA, Reason.RESOURCE_LIMIT,
+                    "$.assets[0].size", "must be between 0 and 8589934592 inclusive");
         }
         String digest = requireString(requireMember(asset, "sha256", "$.assets[0]"),
                 "$.assets[0].sha256", Stage.SCHEMA);

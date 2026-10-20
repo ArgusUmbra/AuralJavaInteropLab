@@ -18,6 +18,7 @@ public final class AllTests {
         ManifestValidatorTest.register(Path.of(arguments[0]));
         ZipStructureParserTest.register(Path.of(arguments[0]).getParent());
         Zip64StructureParserTest.register();
+        AuralPackageVerifierTest.register(Path.of(arguments[0]).getParent());
         TestSupport.finish();
     }
 }

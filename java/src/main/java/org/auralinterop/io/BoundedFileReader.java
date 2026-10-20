@@ -46,6 +46,12 @@ public final class BoundedFileReader implements AutoCloseable {
         return openedSize;
     }
 
+    /** Return the channel's current size, which may differ after concurrent modification. */
+    public long currentSize() throws IOException {
+        ensureOpen();
+        return channel.size();
+    }
+
     public int maximumAllocation() {
         return maximumAllocation;
     }
@@ -86,6 +92,34 @@ public final class BoundedFileReader implements AutoCloseable {
             position = Math.addExact(position, count);
         }
         return result;
+    }
+
+    /**
+     * Fill the remaining portion of {@code destination} from an exact validated file range.
+     * The caller controls and may reuse the buffer; this method performs no payload allocation.
+     */
+    public void readExact(long offset, ByteBuffer destination) throws IOException {
+        Objects.requireNonNull(destination, "destination");
+        ensureOpen();
+        int length = destination.remaining();
+        long end = checkedRangeEnd(offset, length);
+        if (end > openedSize) {
+            throw new BoundedReadException(
+                    Reason.UNEXPECTED_EOF,
+                    "requested range ends at " + end + " beyond opened size " + openedSize);
+        }
+
+        long position = offset;
+        while (destination.hasRemaining()) {
+            int count = channel.read(destination, position);
+            if (count < 0) {
+                throw new BoundedReadException(Reason.UNEXPECTED_EOF, "unexpected EOF at offset " + position);
+            }
+            if (count == 0) {
+                throw new BoundedReadException(Reason.NO_PROGRESS, "file read made no progress at offset " + position);
+            }
+            position = Math.addExact(position, count);
+        }
     }
 
     public int readUnsignedByte(long offset) throws IOException {

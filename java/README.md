@@ -1,14 +1,96 @@
 # AURAL Java clean-room verifier experiment
 
 This is an independent, standard-library-only Java 21 interoperability experiment.
-It is not an official AURAL reference implementation, a certification, or a complete
-AURAL package verifier.
+It is not an official AURAL reference implementation or a certification. It now
+implements the complete Draft 0.2 Core Reader verification scope; Adapter Protocol 1,
+signatures, provenance, attestations, AUFX transport, and evidence interpretation are
+outside this milestone.
 
 `org.auralinterop.manifest.ManifestValidator` is the Draft 0.2 manifest API. Its
 `validate(byte[])` method returns an immutable, parser-independent `Manifest`, or
 throws `ManifestValidationException` with a stable failure stage. Validation performs
 strict UTF-8/I-JSON-profile parsing, schema and semantic checks, JCS canonicalization,
 and exact canonical-byte comparison in that order.
+
+## Complete Core Reader verifier
+
+`org.auralinterop.verify.AuralPackageVerifier.verify(Path)` returns a
+`VerifiedAuralPackage` only after every applicable Draft 0.2 structural, manifest, and
+payload-integrity check succeeds. It otherwise throws `AuralVerificationException`.
+The exception exposes a stable `VerificationErrorCategory`, a more specific detail
+string, and the underlying ZIP, manifest, or I/O cause where one exists.
+
+```java
+AuralPackageVerifier verifier = new AuralPackageVerifier();
+VerifiedAuralPackage verified = verifier.verify(Path.of("recording.aural"));
+
+System.out.println(verified.version());
+System.out.println(verified.originalByteCount());
+System.out.println(verified.computedOriginalSha256());
+```
+
+The success result includes the confirmed version, immutable validated manifest,
+exact original entry name, streamed original byte count, computed and declared
+SHA-256 strings, successful declared/computed CRC32 pairs for both entries, ZIP64 use,
+and `COMPLETE` status. It never contains the original recording bytes. There is no
+"structurally parsed" success variant: the existing `ZipArchiveStructure` remains a
+separate explicitly structural result.
+
+Verification stages are:
+
+1. Enforce the physical package limit and validate classic/ZIP64 records, both exact
+   raw entry names, stored methods, metadata, header agreement, ranges, and layout.
+2. Read only the validated `manifest.json` data range after enforcing its 1 MiB
+   declaration, then call the existing `ManifestValidator.validate(byte[])` for strict
+   JSON, schema/semantic rules, and exact JCS byte equality.
+3. Require the manifest original and asset identity (`audio/original.wav`, `original`,
+   and `audio/wav`) and declared length to agree exactly with the validated ZIP entry.
+4. Calculate and compare standard ZIP CRC32 over the actual manifest bytes.
+5. Stream the original data range once through a reusable 64 KiB buffer, independently
+   count every byte, and incrementally calculate CRC32 and SHA-256 in that pass.
+6. Require a 12-byte WAVE identification prefix: `RIFF` or `RF64` at offsets 0-3 and
+   `WAVE` at offsets 8-11. No complete WAVE decoding or audio-codec restriction is
+   added.
+7. Compare actual original count, unsigned 32-bit CRC32, and lowercase hexadecimal
+   SHA-256 against their respective ZIP and manifest declarations, then report success.
+
+The controlled failure categories are ZIP structure; manifest parsing/canonicalization;
+manifest semantics; missing/mismatched required entry; CRC32; original byte count;
+original SHA-256; WAVE identification; resource limit; and I/O/truncated read. The
+frozen draft does not make diagnostic precedence normative, so callers should depend
+on acceptance versus rejection and the reported failing stage, not assume a malformed
+file with multiple defects must always select one category first.
+
+### Reader and mutation model
+
+The complete operation opens one `BoundedFileReader`, which owns one read-only
+`FileChannel`, and passes that same reader to the structural parser and every payload
+check. The public `ZipStructureParser.parse(BoundedFileReader)` overload leaves its
+caller-owned reader open; the path convenience API remains available and closes its
+own reader. Payloads are read positionally only within already validated ranges. No
+entry is extracted, no evidence byte is written or rewritten, and no high-level ZIP
+extraction API controls acceptance.
+
+The reader records the channel size at open and the verifier rechecks the live channel
+size after structural validation and before success. A size change causes a controlled
+failure. This catches observable truncation or growth, but one open channel is not an
+immutable snapshot: same-size in-place writes, or changes that are made and restored
+between observations, cannot in general be proven absent. A completed SHA-256 proves
+what bytes were observed and their agreement with the manifest; it is not proof that
+the backing file was never concurrently modified.
+
+### Integrity and trust boundary
+
+CRC32 is calculated with `java.util.zip.CRC32` over each complete stored entry and is
+compared as an unsigned 32-bit value. Matching local and central declarations are not
+treated as evidence that payload bytes are intact. SHA-256 is calculated with Java's
+required `MessageDigest` implementation over exactly the stored original byte sequence,
+not decoded samples, normalized audio, the whole archive, or concatenated metadata.
+
+A technically valid AURAL Core package establishes internal container and declaration
+consistency only. It does not independently confirm when or where a recording was made,
+who made it, investigator identity, real-world events, authenticity before packaging,
+absence of pre-package edits, or chain of custody. The Draft 0.2 manifest is unsigned.
 
 ## Classic and ZIP64 structural parser
 
@@ -144,25 +226,50 @@ any `aural-zip64-large-*.aural` file from that dedicated directory manually. Thi
 was designed but was not run for Assignment 7E because explicit authorization is
 required.
 
-### Frozen fixture smoke scope
+### Frozen public Core Reader evaluation
 
-The public 30-case Draft 0.2 inventory is used only as a smoke layer; no fixture names,
-IDs, hashes, or expected answers occur in production code.
+The test harness reads the frozen public case manifest as its external oracle; production
+code never reads case IDs, fixture names, fixture hashes, or expected outcomes. All 30
+required Draft 0.2 cases pass. The normal test output records the ID, expected outcome,
+actual outcome, PASS/FAIL, and actual category for each rejection.
 
-- Structural accepts (4): all four `valid-*` packages. This establishes only that
-  their ZIP envelopes are valid.
-- Structural rejects (10): invalid compression, duplicate entry, entry comment,
-  forbidden extra field, local/central CRC declaration mismatch, malformed local
-  header, special-file metadata, trailer, unnecessary ZIP64 extra, and unsafe ZIP
-  filename. Their published reason is decided entirely by ZIP structure.
-- `NOT_YET_APPLICABLE` (16): altered original, asset hash, critical extension,
-  duplicate JSON key, excessive manifest-declared asset size, excessive JSON depth,
-  fraction, malformed JSON, negative zero, noncanonical JSON, noncharacter, unknown
-  manifest member, unpaired surrogate, unsafe JSON integer, invalid UTF-8, and version.
-  Their ZIP structure is accepted and their final rejection belongs to later semantic
-  or integrity layers.
+| Public case | Expected | Actual | Rejection category |
+|---|---:|---:|---|
+| invalid-altered-original | reject | reject | original SHA-256 |
+| invalid-asset-hash | reject | reject | original SHA-256 |
+| invalid-compression | reject | reject | ZIP structure |
+| invalid-critical-extension | reject | reject | manifest semantic |
+| invalid-duplicate-entry | reject | reject | resource limit (exact entry count) |
+| invalid-duplicate-key | reject | reject | manifest parsing/canonicalization |
+| invalid-entry-comment | reject | reject | ZIP structure |
+| invalid-excessive-declared-size | reject | reject | resource limit |
+| invalid-excessive-depth | reject | reject | resource limit |
+| invalid-extra-field | reject | reject | ZIP structure |
+| invalid-fraction | reject | reject | manifest parsing/canonicalization |
+| invalid-local-central-crc | reject | reject | ZIP structure |
+| invalid-malformed-json | reject | reject | manifest parsing/canonicalization |
+| invalid-malformed-local-header | reject | reject | ZIP structure |
+| invalid-negative-zero | reject | reject | manifest parsing/canonicalization |
+| invalid-noncanonical | reject | reject | manifest parsing/canonicalization |
+| invalid-noncharacter | reject | reject | manifest parsing/canonicalization |
+| invalid-special-file | reject | reject | ZIP structure |
+| invalid-trailer | reject | reject | ZIP structure |
+| invalid-unknown-member | reject | reject | manifest semantic |
+| invalid-unnecessary-zip64-extra | reject | reject | ZIP structure |
+| invalid-unpaired-surrogate | reject | reject | manifest parsing/canonicalization |
+| invalid-unsafe-filename | reject | reject | required entry mismatch |
+| invalid-unsafe-integer | reject | reject | manifest parsing/canonicalization |
+| invalid-utf8 | reject | reject | manifest parsing/canonicalization |
+| invalid-version | reject | reject | manifest semantic |
+| valid-independent | accept | accept | - |
+| valid-minimal | accept | accept | - |
+| valid-unicode | accept | accept | - |
+| valid-unknown-optional | accept | accept | - |
 
-These smoke results are not a claim of complete 30-case Core Reader conformance.
+The two optional Draft 0.1 fixtures are not accepted as Draft 0.2 and are covered as
+controlled-rejection capability tests. No legacy Draft 0.1 verifier is implemented.
+Passing this frozen corpus is a regression result, not independent certification or a
+claim of third-party adoption.
 
 ### Recorded specification interpretations
 
@@ -190,8 +297,18 @@ without treating them as new normative requirements:
   appear without a sentinel if every value agrees.” Both interpretations are covered
   by tests; the conservative interpretation is the active one.
 
-Full CRC32 streaming, manifest integration, WAVE identification,
-original byte count/SHA-256, and complete package verdicts remain for Assignment 7F.
+Small classic and ZIP64 packages are completely verified in the normal suite, including
+sentinel-expanded entry sizes and a ZIP64 terminal envelope. All counters and offsets
+in the complete verifier are `long`, and original memory use stays fixed at 64 KiB.
+The existing optional >4 GiB test still validates structural parsing only; it was
+reviewed for compatibility but was not run or expanded during this assignment. A real
+>4 GiB full-verification streaming run therefore remains undemonstrated. Its residual
+risk is environmental and integration behavior at genuine large offsets, despite the
+small ZIP64 and synthetic boundary coverage.
+
+Adapter Protocol 1 integration is the remaining planned 7G work. Provenance signatures,
+detached signed events, team attestations, AUFX transport, and evidence interpretation
+remain separate capabilities.
 
 Build from the `java` directory on Windows without changing machine policy:
 
@@ -206,9 +323,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\test.ps1
 ```
 
 The project has no third-party dependencies and is compiled with `javac --release 21`.
-The build also enables `-Xlint:all -Werror`. The normal suite currently contains 304
-tests: all 223 pre-7E tests remain registered, and 81 independently assembled ZIP64
-tests were added (22 valid acceptances and 59 malformed/adversarial rejections). The
-nine pre-existing 7D ZIP64 boundary tests now assert 7E behavior rather than a temporary
-unsupported result; across both sets, ZIP64 coverage is 23 acceptances and 67
-rejections. The optional >4 GiB test is not included in that count.
+The build also enables `-Xlint:all -Werror`. The normal suite contains 401 tests:
+all 304 pre-7F tests remain registered; 65 independent complete-verifier cases were
+added (21 positive and 44 negative); all 30 required public Core Reader cases are
+separate oracle-driven regressions; and two optional legacy fixtures confirm the
+explicit Draft 0.1 capability boundary. The optional >4 GiB test is not registered or
+included in that count.
