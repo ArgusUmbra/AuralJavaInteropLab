@@ -254,7 +254,7 @@ final class AuralPackageVerifierTest {
                 TestSupport.assertTrue(pass, "public outcome mismatch for " + id);
             });
         }
-        TestSupport.assertEquals(30, required);
+        TestSupport.assertEquals(33, required);
     }
 
     private static void legacyCapabilityBoundary(Path fixtureDirectory) {

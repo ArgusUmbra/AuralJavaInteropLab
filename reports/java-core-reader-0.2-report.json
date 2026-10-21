@@ -9,7 +9,7 @@
   "cases": [
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-altered-original",
-      "duration_ms": 750,
+      "duration_ms": 234,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-altered-original.aural",
@@ -24,7 +24,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-asset-hash",
-      "duration_ms": 594,
+      "duration_ms": 234,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-asset-hash.aural",
@@ -39,7 +39,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-compression",
-      "duration_ms": 703,
+      "duration_ms": 172,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-compression.aural",
@@ -54,7 +54,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-critical-extension",
-      "duration_ms": 516,
+      "duration_ms": 219,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-critical-extension.aural",
@@ -69,7 +69,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-duplicate-entry",
-      "duration_ms": 437,
+      "duration_ms": 188,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-duplicate-entry.aural",
@@ -84,7 +84,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-duplicate-key",
-      "duration_ms": 454,
+      "duration_ms": 187,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-duplicate-key.aural",
@@ -99,7 +99,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-entry-comment",
-      "duration_ms": 687,
+      "duration_ms": 188,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-entry-comment.aural",
@@ -114,7 +114,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-excessive-declared-size",
-      "duration_ms": 781,
+      "duration_ms": 218,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-excessive-declared-size.aural",
@@ -129,7 +129,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-excessive-depth",
-      "duration_ms": 516,
+      "duration_ms": 203,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-excessive-depth.aural",
@@ -144,7 +144,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-extra-field",
-      "duration_ms": 406,
+      "duration_ms": 157,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-extra-field.aural",
@@ -159,7 +159,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-fraction",
-      "duration_ms": 453,
+      "duration_ms": 218,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-fraction.aural",
@@ -174,7 +174,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-local-central-crc",
-      "duration_ms": 375,
+      "duration_ms": 219,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-local-central-crc.aural",
@@ -189,7 +189,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-malformed-json",
-      "duration_ms": 453,
+      "duration_ms": 219,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-malformed-json.aural",
@@ -204,7 +204,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-malformed-local-header",
-      "duration_ms": 329,
+      "duration_ms": 172,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-malformed-local-header.aural",
@@ -219,7 +219,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-negative-zero",
-      "duration_ms": 390,
+      "duration_ms": 219,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-negative-zero.aural",
@@ -233,8 +233,23 @@
       "status": "PASS"
     },
     {
+      "case_id": "aural-core-reader/0.2-draft/invalid-missing-required-zip64-end",
+      "duration_ms": 171,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-missing-required-zip64-end.aural",
+        "sha256": "fb6db3b8a5aa22d4a8bd15c6e764ad876188667500deadd46608f542f03c0368",
+        "size": 549
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
       "case_id": "aural-core-reader/0.2-draft/invalid-noncanonical",
-      "duration_ms": 391,
+      "duration_ms": 219,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-noncanonical.aural",
@@ -249,7 +264,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-noncharacter",
-      "duration_ms": 406,
+      "duration_ms": 250,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-noncharacter.aural",
@@ -264,7 +279,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-special-file",
-      "duration_ms": 328,
+      "duration_ms": 188,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-special-file.aural",
@@ -278,8 +293,23 @@
       "status": "PASS"
     },
     {
+      "case_id": "aural-core-reader/0.2-draft/invalid-redundant-zip64-end",
+      "duration_ms": 187,
+      "expected_outcome": "reject",
+      "fixture": {
+        "path": "invalid-redundant-zip64-end.aural",
+        "sha256": "4950711ac54d29564b437e38383c5aa69c4f7fed732ab2deb7b1394a76e1201d",
+        "size": 625
+      },
+      "observed_outcome": "reject",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
       "case_id": "aural-core-reader/0.2-draft/invalid-trailer",
-      "duration_ms": 313,
+      "duration_ms": 188,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-trailer.aural",
@@ -294,7 +324,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-unknown-member",
-      "duration_ms": 343,
+      "duration_ms": 218,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-unknown-member.aural",
@@ -309,7 +339,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-unnecessary-zip64-extra",
-      "duration_ms": 297,
+      "duration_ms": 172,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-unnecessary-zip64-extra.aural",
@@ -324,7 +354,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-unpaired-surrogate",
-      "duration_ms": 407,
+      "duration_ms": 266,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-unpaired-surrogate.aural",
@@ -339,7 +369,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-unsafe-filename",
-      "duration_ms": 296,
+      "duration_ms": 187,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-unsafe-filename.aural",
@@ -354,7 +384,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-unsafe-integer",
-      "duration_ms": 407,
+      "duration_ms": 235,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-unsafe-integer.aural",
@@ -369,7 +399,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-utf8",
-      "duration_ms": 359,
+      "duration_ms": 234,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-utf8.aural",
@@ -384,7 +414,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/invalid-version",
-      "duration_ms": 359,
+      "duration_ms": 188,
       "expected_outcome": "reject",
       "fixture": {
         "path": "invalid-version.aural",
@@ -399,7 +429,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/valid-independent",
-      "duration_ms": 375,
+      "duration_ms": 250,
       "expected_outcome": "accept",
       "fixture": {
         "path": "valid-independent.aural",
@@ -414,7 +444,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/valid-minimal",
-      "duration_ms": 391,
+      "duration_ms": 219,
       "expected_outcome": "accept",
       "fixture": {
         "path": "valid-minimal.aural",
@@ -429,7 +459,7 @@
     },
     {
       "case_id": "aural-core-reader/0.2-draft/valid-unicode",
-      "duration_ms": 375,
+      "duration_ms": 250,
       "expected_outcome": "accept",
       "fixture": {
         "path": "valid-unicode.aural",
@@ -443,8 +473,23 @@
       "status": "PASS"
     },
     {
+      "case_id": "aural-core-reader/0.2-draft/valid-required-zip64-end",
+      "duration_ms": 234,
+      "expected_outcome": "accept",
+      "fixture": {
+        "path": "valid-required-zip64-end.aural",
+        "sha256": "c4b2019336614e509388f04ddefeef5311052a3a81355892869c16bef621866b",
+        "size": 625
+      },
+      "observed_outcome": "accept",
+      "profile_id": "aural-core-reader",
+      "profile_version": "0.2-draft",
+      "requirement": "required",
+      "status": "PASS"
+    },
+    {
       "case_id": "aural-core-reader/0.2-draft/valid-unknown-optional",
-      "duration_ms": 375,
+      "duration_ms": 219,
       "expected_outcome": "accept",
       "fixture": {
         "path": "valid-unknown-optional.aural",
@@ -465,10 +510,10 @@
     "python_implementation": "CPython",
     "python_version": "3.11.5"
   },
-  "generated_at": "2026-10-20T04:56:44.577899Z",
+  "generated_at": "2026-10-21T21:43:11.434823Z",
   "manifest": {
     "path": "C:\\CodexLab\\AuralJavaInteropLab\\frozen-input\\tests\\fixtures\\conformance\\core-reader-0.2-cases.v1.json",
-    "sha256": "eea283420315768e4bce2d5824408d671d34c08db06482da845d75dc3118e204"
+    "sha256": "62b94aa4ce6d3acf6a8da04c35220e89102d831f73f8e9baf189a975fb1c0aa0"
   },
   "notice": "Conformance-test evidence; not official certification or security certification.",
   "optional_legacy_included": false,
@@ -492,17 +537,17 @@
       "timeouts": 0
     },
     "overall_result": "PASS",
-    "passed": 30,
+    "passed": 33,
     "required": {
       "execution_errors": 0,
       "failed": 0,
-      "passed": 30,
-      "selected": 30,
+      "passed": 33,
+      "selected": 33,
       "skipped": 0,
       "timeouts": 0
     },
-    "required_cases": 30,
-    "selected_cases": 30,
+    "required_cases": 33,
+    "selected_cases": 33,
     "skipped": 0,
     "timeouts": 0
   },

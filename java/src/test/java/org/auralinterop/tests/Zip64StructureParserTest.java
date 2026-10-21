@@ -273,7 +273,7 @@ final class Zip64StructureParserTest {
                     put32(build.bytes, build.eocdOffset + 16, build.centralOffset + 1L);
                     return build.bytes;
                 });
-        negative("unneeded ZIP64 terminal envelope experimental rejection", builder ->
+        negative("redundant ZIP64 terminal envelope prohibited by strict necessity rule", builder ->
                 builder.terminal = true, build -> build.bytes);
         negative("duplicated ZIP64 terminal structure creates undeclared gap", builder ->
                 builder.withTerminal(END_CENTRAL_SIZE), build -> {

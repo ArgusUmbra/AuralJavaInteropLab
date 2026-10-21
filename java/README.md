@@ -229,7 +229,7 @@ required.
 ### Frozen public Core Reader evaluation
 
 The test harness reads the frozen public case manifest as its external oracle; production
-code never reads case IDs, fixture names, fixture hashes, or expected outcomes. All 30
+code never reads case IDs, fixture names, fixture hashes, or expected outcomes. All 33
 required Draft 0.2 cases pass. The normal test output records the ID, expected outcome,
 actual outcome, PASS/FAIL, and actual category for each rejection.
 
@@ -250,9 +250,11 @@ actual outcome, PASS/FAIL, and actual category for each rejection.
 | invalid-malformed-json | reject | reject | manifest parsing/canonicalization |
 | invalid-malformed-local-header | reject | reject | ZIP structure |
 | invalid-negative-zero | reject | reject | manifest parsing/canonicalization |
+| invalid-missing-required-zip64-end | reject | reject | ZIP structure |
 | invalid-noncanonical | reject | reject | manifest parsing/canonicalization |
 | invalid-noncharacter | reject | reject | manifest parsing/canonicalization |
 | invalid-special-file | reject | reject | ZIP structure |
+| invalid-redundant-zip64-end | reject | reject | ZIP structure |
 | invalid-trailer | reject | reject | ZIP structure |
 | invalid-unknown-member | reject | reject | manifest semantic |
 | invalid-unnecessary-zip64-extra | reject | reject | ZIP structure |
@@ -264,6 +266,7 @@ actual outcome, PASS/FAIL, and actual category for each rejection.
 | valid-independent | accept | accept | - |
 | valid-minimal | accept | accept | - |
 | valid-unicode | accept | accept | - |
+| valid-required-zip64-end | accept | accept | - |
 | valid-unknown-optional | accept | accept | - |
 
 The two optional Draft 0.1 fixtures are not accepted as Draft 0.2 and are covered as
@@ -287,15 +290,10 @@ without treating them as new normative requirements:
 - A second EOCD is rejected when it creates undeclared bytes or contradictory terminal
   placement. EOCD-signature octets occurring inside legitimate entry data are not
   globally banned.
-- Frozen Draft 0.2 section 6.4 says terminal ZIP64 records are mandatory when the
-  classic EOCD uses a sentinel, but does not explicitly say whether those records are
-  permitted when every classic EOCD field is non-sentinel. This experiment chooses
-  the conservative behavior: reject an otherwise exact terminal ZIP64 envelope when
-  no classic EOCD sentinel applies. The alternate interpretation would accept that
-  redundant envelope, so this ambiguity affects acceptance. A future AURAL revision
-  should say explicitly either “MUST NOT appear without an EOCD sentinel” or “MAY
-  appear without a sentinel if every value agrees.” Both interpretations are covered
-  by tests; the conservative interpretation is the active one.
+- Frozen Draft 0.2 section 6.4 explicitly requires terminal ZIP64 records whenever
+  at least one classic EOCD field uses a ZIP64 sentinel and prohibits those records
+  when no classic EOCD field uses a sentinel. The Java parser enforces both directions,
+  including rejection of missing-required and redundant terminal ZIP64 envelopes.
 
 Small classic and ZIP64 packages are completely verified in the normal suite, including
 sentinel-expanded entry sizes and a ZIP64 terminal envelope. All counters and offsets
@@ -345,8 +343,8 @@ python tools\run_aural_conformance.py `
   --adapter C:\CodexLab\AuralJavaInteropLab\java\aural-adapter.cmd
 ```
 
-The recorded Assignment 7G run passed all 30 required Draft 0.2 Core Reader cases with
-no failures, execution errors, timeouts, or skips. The report is test evidence, not
+The recorded synchronization run passed all 33 required Draft 0.2 Core Reader cases
+with no failures, execution errors, timeouts, or skips. The report is test evidence, not
 official certification or security certification. Protocol 1 defines no format field
 in its envelope: supported AURAL format/version identification remains part of the
 delegated package verifier.
@@ -367,9 +365,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\test.ps1
 ```
 
 The project has no third-party dependencies and is compiled with `javac --release 21`.
-The build also enables `-Xlint:all -Werror`. The normal suite contains 421 tests:
+The build also enables `-Xlint:all -Werror`. The normal suite contains 424 tests:
 all 304 pre-7F tests remain registered; 65 independent complete-verifier cases were
-added (21 positive and 44 negative); all 30 required public Core Reader cases are
+added (21 positive and 44 negative); all 33 required public Core Reader cases are
 separate oracle-driven regressions; two optional legacy fixtures confirm the explicit
 Draft 0.1 capability boundary; and 20 separate adapter process tests cover acceptance,
 rejection, malformed envelopes, unsupported values, field types, byte limits, output
